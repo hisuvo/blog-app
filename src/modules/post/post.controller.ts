@@ -3,13 +3,17 @@ import { postService } from "./post.service";
 
 const createPost = async (req: Request, res: Response) => {
   try {
-    const result = await postService.createPost(req.body);
+    const user = req.user;
 
-    res.status(201).json({
-      success: true,
-      message: "Post create done.",
-      data: result,
-    });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+    const result = await postService.createPost(req.body, user.id);
+
+    res.status(201).json(result);
   } catch (error: any) {
     res.status(400).json({
       success: false,

@@ -5,7 +5,6 @@ import { auth } from "./lib/auth";
 import { toNodeHandler } from "better-auth/node";
 
 const app = express();
-
 app.use(
   cors({
     origin: "http://localhost:3000",
