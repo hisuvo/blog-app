@@ -1,12 +1,31 @@
 import { Request, Response } from "express";
 import { postService } from "./post.service";
+import { boolean } from "better-auth/*";
+import { PostStatus } from "../../../generated/prisma/enums";
 
 const getAllPost = async (req: Request, res: Response) => {
   try {
     const { search } = req.query;
     const searchString = typeof search === "string" ? search : undefined;
-    console.log(searchString);
-    const blogs = await postService.getAllPost({ search: searchString });
+
+    const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+    const isFeatured = req.query.isFeatured
+      ? req.query.isFeatured === "true"
+        ? true
+        : req.query.isFeatured === "false"
+        ? false
+        : undefined
+      : undefined;
+
+    const status = req.query.status as PostStatus;
+
+    const blogs = await postService.getAllPost({
+      search: searchString,
+      tags,
+      isFeatured,
+      status,
+    });
 
     res.status(200).json({
       success: true,
