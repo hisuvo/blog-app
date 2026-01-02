@@ -1,6 +1,26 @@
 import { Request, Response } from "express";
 import { postService } from "./post.service";
 
+const getAllPost = async (req: Request, res: Response) => {
+  try {
+    const { search } = req.query;
+    const searchString = typeof search === "string" ? search : undefined;
+    console.log(searchString);
+    const blogs = await postService.getAllPost({ search: searchString });
+
+    res.status(200).json({
+      success: true,
+      message: "Blogs retrived succssfully",
+      data: blogs,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const createPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
@@ -24,4 +44,5 @@ const createPost = async (req: Request, res: Response) => {
 
 export const postController = {
   createPost,
+  getAllPost,
 };
