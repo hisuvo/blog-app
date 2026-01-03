@@ -7,6 +7,9 @@ const getAllPost = async (payload: {
   tags: string[] | [];
   isFeatured: boolean | undefined;
   status: PostStatus;
+  page: number;
+  limit: number;
+  skip: number;
 }) => {
   const andCondition: PostWhereInput[] = [];
 
@@ -54,12 +57,15 @@ const getAllPost = async (payload: {
     });
   }
 
-  const result = await prisma.post.findMany({
+  const allPost = await prisma.post.findMany({
+    take: payload.limit,
+    skip: payload.skip,
     where: {
       AND: andCondition,
     },
   });
-  return result;
+
+  return allPost;
 };
 
 const createPost = async (

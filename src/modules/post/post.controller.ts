@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { postService } from "./post.service";
-import { boolean } from "better-auth/*";
 import { PostStatus } from "../../../generated/prisma/enums";
 
 const getAllPost = async (req: Request, res: Response) => {
@@ -20,11 +19,18 @@ const getAllPost = async (req: Request, res: Response) => {
 
     const status = req.query.status as PostStatus;
 
+    const page = Number(req.query.page ?? 1);
+    const limit = Number(req.query.limit ?? 5);
+    const skip = (page - 1) * limit;
+
     const blogs = await postService.getAllPost({
       search: searchString,
       tags,
       isFeatured,
       status,
+      page,
+      limit,
+      skip,
     });
 
     res.status(200).json({
