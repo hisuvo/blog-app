@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { postService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helper/paginationSortingHelper";
+import { success } from "better-auth/*";
 
 const getAllPost = async (req: Request, res: Response) => {
   try {
@@ -30,8 +31,6 @@ const getAllPost = async (req: Request, res: Response) => {
     const { page, limit, skip, sortBy, orderBy } =
       await paginationSortingHelper(req.query);
 
-    console.log({ page, limit, skip, sortBy, orderBy });
-
     const blogs = await postService.getAllPost({
       search: searchString,
       tags,
@@ -57,10 +56,27 @@ const getAllPost = async (req: Request, res: Response) => {
   }
 };
 
+const getPostById = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params;
+    const result = await postService.getPostById({ postId });
+
+    res.status(200).json({
+      success: true,
+      message: "Post retrived successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const createPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
-
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -81,4 +97,5 @@ const createPost = async (req: Request, res: Response) => {
 export const postController = {
   createPost,
   getAllPost,
+  getPostById,
 };

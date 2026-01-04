@@ -86,6 +86,45 @@ const getAllPost = async (payload: {
   };
 };
 
+const getPostById = async (payload: { postId?: string }) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const post = await tx.post.findFirst({
+      where: {
+        id: payload.postId,
+      },
+    });
+
+    await tx.post.updateMany({
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+
+    return post;
+  });
+
+  return result;
+
+  /* transaction withour find and update views */
+
+  // const result = await prisma.post.findFirst({
+  //   where: {
+  //     id: payload.postId,
+  //   },
+  // });
+
+  // await prisma.post.updateMany({
+  //   data: {
+  //     views: {
+  //       increment: 1,
+  //     },
+  //   },
+  // });
+  // return result;
+};
+
 const createPost = async (
   data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">,
   userId: string
@@ -100,4 +139,5 @@ const createPost = async (
 export const postService = {
   createPost,
   getAllPost,
+  getPostById,
 };
