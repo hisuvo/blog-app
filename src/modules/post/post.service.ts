@@ -10,6 +10,8 @@ const getAllPost = async (payload: {
   page: number;
   limit: number;
   skip: number;
+  sortBy: string;
+  orderBy: string;
 }) => {
   const andCondition: PostWhereInput[] = [];
 
@@ -63,9 +65,25 @@ const getAllPost = async (payload: {
     where: {
       AND: andCondition,
     },
+
+    orderBy: {
+      [payload.sortBy]: payload.orderBy,
+    },
   });
 
-  return allPost;
+  const total: number = await prisma.post.count({
+    where: {
+      AND: andCondition,
+    },
+  });
+
+  return {
+    data: allPost,
+    totalPost: total,
+    page: payload.page,
+    limit: payload.limit,
+    totalPages: Math.ceil(total / payload.limit),
+  };
 };
 
 const createPost = async (
