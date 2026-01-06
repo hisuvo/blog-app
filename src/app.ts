@@ -17,6 +17,6 @@ app.use(express.json());
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use("/api/v1", postRouter);
-app.use("/api/v1", commentRouter);
+app.use("/api/v1/comment", commentRouter);
 
 export default app;
