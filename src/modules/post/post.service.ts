@@ -73,6 +73,12 @@ const getAllPost = async (payload: {
     orderBy: {
       [payload.sortBy]: payload.orderBy,
     },
+
+    include: {
+      _count: {
+        select: { comments: true },
+      },
+    },
   });
 
   const total: number = await prisma.post.count({
@@ -128,6 +134,12 @@ const getPostById = async (payload: { postId?: string }) => {
                 createdAt: "desc",
               },
             },
+          },
+        },
+
+        _count: {
+          select: {
+            comments: true,
           },
         },
       },
