@@ -1,4 +1,8 @@
-import { Post, PostStatus } from "../../../generated/prisma/client";
+import {
+  CommentStatus,
+  Post,
+  PostStatus,
+} from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
@@ -91,6 +95,41 @@ const getPostById = async (payload: { postId?: string }) => {
     const post = await tx.post.findFirst({
       where: {
         id: payload.postId,
+      },
+      include: {
+        comments: {
+          where: {
+            parentId: null,
+          },
+
+          orderBy: {
+            createdAt: "desc",
+          },
+
+          include: {
+            replies: {
+              where: {
+                status: CommentStatus.APPROVE,
+              },
+
+              include: {
+                replies: {
+                  where: {
+                    status: CommentStatus.APPROVE,
+                  },
+
+                  orderBy: {
+                    createdAt: "asc",
+                  },
+                },
+              },
+
+              orderBy: {
+                createdAt: "desc",
+              },
+            },
+          },
+        },
       },
     });
 
