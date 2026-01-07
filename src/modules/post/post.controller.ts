@@ -84,10 +84,10 @@ const getMyPost = async (req: Request, res: Response) => {
     const result = await postService.getMyPost(user?.id as string);
 
     res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: error,
     });
   }
 };
