@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { postService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helper/paginationSortingHelper";
-import { success } from "better-auth/*";
 
 const getAllPost = async (req: Request, res: Response) => {
   try {
@@ -74,15 +73,36 @@ const getPostById = async (req: Request, res: Response) => {
   }
 };
 
+const getMyPost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      throw new Error("You are unauthorized");
+    }
+
+    const result = await postService.getMyPost(user?.id as string);
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const createPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
+
     if (!user) {
       return res.status(400).json({
         success: false,
         message: "Unauthorized",
       });
     }
+
     const result = await postService.createPost(req.body, user.id);
 
     res.status(201).json(result);
@@ -98,4 +118,5 @@ export const postController = {
   createPost,
   getAllPost,
   getPostById,
+  getMyPost,
 };

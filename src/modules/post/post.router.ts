@@ -4,11 +4,14 @@ import auth, { UserRole } from "../../middleware/auth";
 
 const router = express.Router();
 
-router.get("/blogs", auth(UserRole.USER), postController.getAllPost);
-router.get("/blogs/:postId", postController.getPostById);
+router.get("/", auth(UserRole.USER), postController.getAllPost);
+
+router.get("/myPost", auth(UserRole.USER), postController.getMyPost);
+
+router.get("/:postId", postController.getPostById);
 
 router.post(
-  "/blogs",
+  "/",
   auth(UserRole.USER, UserRole.ADMIN),
   postController.createPost
 );
