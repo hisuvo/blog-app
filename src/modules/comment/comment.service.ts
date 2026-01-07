@@ -121,6 +121,34 @@ const moderateComment = async (commentId: string, status: CommentStatus) => {
   });
 };
 
+const updateComment = async (
+  commentId: string,
+  data: { content?: string; status?: CommentStatus },
+  authorId: string
+) => {
+  const isExist = await prisma.comment.findFirst({
+    where: {
+      id: commentId,
+      authorId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!isExist) {
+    throw new Error("You are unauthorized");
+  }
+
+  return await prisma.comment.update({
+    where: {
+      id: commentId,
+      authorId,
+    },
+    data,
+  });
+};
+
 export const commentService = {
   getAllComment,
   getCommentById,
@@ -128,4 +156,5 @@ export const commentService = {
   createComment,
   deleteCommentById,
   moderateComment,
+  updateComment,
 };

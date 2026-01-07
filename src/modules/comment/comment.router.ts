@@ -4,7 +4,7 @@ import auth, { UserRole } from "../../middleware/auth";
 
 const router = express.Router();
 
-router.get("/", commentController.getAllComment);
+router.get("/", auth(UserRole.USER), commentController.getAllComment);
 
 router.get(
   "/:commentId",
@@ -34,6 +34,12 @@ router.patch(
   "/:commentId/moderate",
   auth(UserRole.ADMIN),
   commentController.moderateComment
+);
+
+router.patch(
+  "/:commentId",
+  auth(UserRole.USER, UserRole.ADMIN),
+  commentController.updateComment
 );
 
 export const commentRouter = router;
