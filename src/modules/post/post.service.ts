@@ -301,6 +301,38 @@ const deletePost = async (
   });
 };
 
+const postStats = async () => {
+  return await prisma.$transaction(async (tx) => {
+    const [
+      totalPost,
+      publishedPost,
+      drafPost,
+      archivedPost,
+      totalComment,
+      approvedComment,
+      rejectComment,
+    ] = await Promise.all([
+      await tx.post.count(),
+      await tx.post.count({ where: { status: PostStatus.PUBLISHED } }),
+      await tx.post.count({ where: { status: PostStatus.ARCHIVED } }),
+      await tx.post.count({ where: { status: PostStatus.DRAF } }),
+      await tx.comment.count(),
+      await tx.comment.count({ where: { status: CommentStatus.APPROVE } }),
+      await tx.comment.count({ where: { status: CommentStatus.REJECT } }),
+    ]);
+
+    return {
+      totalPost,
+      publishedPost,
+      drafPost,
+      archivedPost,
+      totalComment,
+      approvedComment,
+      rejectComment,
+    };
+  });
+};
+
 export const postService = {
   createPost,
   getAllPost,
@@ -308,4 +340,5 @@ export const postService = {
   getMyPost,
   updatePost,
   deletePost,
+  postStats,
 };
