@@ -16,4 +16,9 @@ router.post(
   postController.createPost
 );
 
+router.patch(
+  "/:postId",
+  auth(UserRole.USER, UserRole.ADMIN),
+  postController.updatePost
+);
 export default router;

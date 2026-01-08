@@ -235,9 +235,46 @@ const createPost = async (
   return result;
 };
 
+const updatePost = async (
+  postId: string,
+  data: Partial<Post>,
+  authorId: string,
+  isAdmin: boolean
+) => {
+  const post = await prisma.post.findUnique({
+    where: {
+      id: postId,
+    },
+    select: {
+      id: true,
+      authorId: true,
+    },
+  });
+
+  if (!post) {
+    throw new Error("Post not found!");
+  }
+
+  if (!isAdmin && post.authorId !== authorId) {
+    throw new Error("You are unauthorized");
+  }
+
+  if (!isAdmin) {
+    delete data.isFeatured;
+  }
+
+  return await prisma.post.update({
+    where: {
+      id: postId,
+    },
+    data,
+  });
+};
+
 export const postService = {
   createPost,
   getAllPost,
   getPostById,
   getMyPost,
+  updatePost,
 };

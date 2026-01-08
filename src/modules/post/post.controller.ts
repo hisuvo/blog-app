@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { postService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helper/paginationSortingHelper";
+import { success } from "better-auth/*";
+import { UserRole } from "../../middleware/auth";
 
 const getAllPost = async (req: Request, res: Response) => {
   try {
@@ -114,9 +116,43 @@ const createPost = async (req: Request, res: Response) => {
   }
 };
 
+const updatePost = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params;
+    const user = req.user;
+
+    if (!user) {
+      throw new Error("You are Unanthorized!");
+    }
+
+    const isAdmin = user.role === UserRole.ADMIN;
+
+    console.log(isAdmin);
+
+    const result = await postService.updatePost(
+      postId as string,
+      req.body,
+      user?.id as string,
+      isAdmin as boolean
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "post updated successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const postController = {
   createPost,
   getAllPost,
   getPostById,
   getMyPost,
+  updatePost,
 };
