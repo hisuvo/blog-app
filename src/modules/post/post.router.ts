@@ -4,11 +4,19 @@ import auth, { UserRole } from "../../middleware/auth";
 
 const router = express.Router();
 
-router.get("/", auth(UserRole.USER), postController.getAllPost);
+router.get("/", auth(UserRole.USER, UserRole.ADMIN), postController.getAllPost);
 
-router.get("/myPost", auth(UserRole.USER), postController.getMyPost);
+router.get(
+  "/myPost",
+  auth(UserRole.USER, UserRole.ADMIN),
+  postController.getMyPost
+);
 
-router.get("/:postId", postController.getPostById);
+router.get(
+  "/:postId",
+  auth(UserRole.USER, UserRole.ADMIN),
+  postController.getPostById
+);
 
 router.post(
   "/",
@@ -21,4 +29,11 @@ router.patch(
   auth(UserRole.USER, UserRole.ADMIN),
   postController.updatePost
 );
+
+router.delete(
+  "/:postId",
+  auth(UserRole.USER, UserRole.ADMIN),
+  postController.deletePost
+);
+
 export default router;
